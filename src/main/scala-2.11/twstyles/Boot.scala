@@ -26,5 +26,6 @@ object Boot {
     configBuilder.setOAuthAccessTokenSecret(accessTokenSecret)
 
     new TwitterService(configBuilder.build)
+
   }
 }

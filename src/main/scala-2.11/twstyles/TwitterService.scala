@@ -1,6 +1,7 @@
 package twstyles
 
-import twitter4j.conf.{Configuration}
+import com.typesafe.config.ConfigFactory
+import twitter4j.conf.{Configuration,ConfigurationBuilder}
 import twitter4j._
 import scala.collection.JavaConversions._
 
@@ -98,5 +99,37 @@ class TwitterService (config: Configuration) {
         }
       case _ => remainingTweets.head #:: getPageableStream(remainingTweets.tail, page, nextResultGetter)
     }
+  }
+}
+
+object TwitterService {
+
+  def apply(config:Configuration) = {
+    new TwitterService(config)
+  }
+
+  /**
+   * Gets the default twitter configuration from your resources/application.conf
+   * @return
+   */
+  def getDefaultConfig ():Configuration = {
+    val conf = ConfigFactory.load()
+
+
+    val (consumerKey, consumerSecret, accessToken, accessTokenSecret) = (
+      conf.getString("twitter.consumerKey"),
+      conf.getString("twitter.consumerSecret"),
+      conf.getString("twitter.accessToken"),
+      conf.getString("twitter.accessTokenSecret")
+      )
+
+    val configBuilder = new ConfigurationBuilder()
+
+    configBuilder.setOAuthConsumerKey(consumerKey)
+    configBuilder.setOAuthConsumerSecret(consumerSecret)
+    configBuilder.setOAuthAccessToken(accessToken)
+    configBuilder.setOAuthAccessTokenSecret(accessTokenSecret)
+
+    configBuilder.build
   }
 }

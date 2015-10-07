@@ -32,10 +32,16 @@ class TwitterService (config: Configuration) {
 
   protected def queryToStream (queryGetter: => QueryResult): Stream[Status] = {
     val queryResult = queryGetter
-    getTweetStream(queryResult.getTweets.toList, queryResult)
+    getQueryableStream(queryResult.getTweets.toList, queryResult)
   }
 
-  protected def getTweetStream (remainingTweets:List[Status], currQueryResult: QueryResult): Stream[Status] = {
+  protected def pageableToStream (getterFn: (Paging) => ResponseList[Status], pageSize:Int = 100, pageStart:Int = 1): Stream[Status] = {
+    val page = new Paging(pageStart, pageStart)
+    val initResultList = getterFn(page).toList //TODO: should probably just use toStream tbh
+    getPageableStream(initResultList, page, getterFn)
+  }
+
+  protected def getQueryableStream (remainingTweets:List[Status], currQueryResult: QueryResult): Stream[Status] = {
     //N.b. the #:: / Stream.cons operator/function does not require tailrecursion to guard against a max recursion
     //error - the second argument is a thunk stored lazily
     remainingTweets match {
@@ -45,20 +51,14 @@ class TwitterService (config: Configuration) {
           case Some(results:QueryResult) =>
             results.getTweets.toList match {
               case Nil => Stream.Empty
-              case a => a.head #:: getTweetStream(a.tail, results)
+              case a => a.head #:: getQueryableStream(a.tail, results)
             }
         }
-      case _ => remainingTweets.head #:: getTweetStream(remainingTweets.tail, currQueryResult)
+      case _ => remainingTweets.head #:: getQueryableStream(remainingTweets.tail, currQueryResult)
     }
   }
 
-  protected def pageableToStream (getterFn: (Paging) => ResponseList[Status], pageSize:Int = 100, pageStart:Int = 1): Stream[Status] = {
-    val page = new Paging(pageStart, pageStart)
-    val initResultList = getterFn(page).toList //TODO: should probably just use toStream tbh
-    getTweetPageable(initResultList, page, getterFn)
-  }
-
-  protected def getTweetPageable (remainingTweets:List[Status], page:Paging,
+  protected def getPageableStream (remainingTweets:List[Status], page:Paging,
                                   nextResultGetter: (Paging) => ResponseList[Status]): Stream[Status] = {
     remainingTweets match {
       case Nil =>
@@ -67,12 +67,9 @@ class TwitterService (config: Configuration) {
           case Nil => Stream.Empty
           case a =>
             val aList = a.toList
-            aList.head #:: getTweetPageable(aList.tail, page, nextResultGetter)
+            aList.head #:: getPageableStream(aList.tail, page, nextResultGetter)
         }
-      case _ => remainingTweets.head #:: getTweetPageable(remainingTweets.tail, page, nextResultGetter)
+      case _ => remainingTweets.head #:: getPageableStream(remainingTweets.tail, page, nextResultGetter)
     }
   }
-
-
-
 }

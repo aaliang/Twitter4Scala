@@ -51,7 +51,7 @@ class TwitterService (config: Configuration) {
         case Some(results:QueryResult) =>
           results.getTweets.toList match {
             case List() => Stream.Empty
-            case a => Stream.cons(a.head, getTweetStream(a.tail.toList, results))
+            case a => Stream.cons(a.head, getTweetStream(a.tail, results))
           }
       }
     } else {

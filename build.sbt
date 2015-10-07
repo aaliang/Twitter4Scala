@@ -11,3 +11,5 @@ libraryDependencies ++= Seq(
 )
 
 mainClass in (Compile, run) := Some("twstyles.Boot")
+
+initialCommands in console := """val tw = new twstyles.TwitterService()"""

@@ -12,4 +12,4 @@ libraryDependencies ++= Seq(
 
 mainClass in (Compile, run) := Some("twstyles.Boot")
 
-initialCommands in console := """val tw = new twstyles.TwitterService()"""
+initialCommands in console := """val tw = twstyles.Boot.getTwitterServiceInstance"""

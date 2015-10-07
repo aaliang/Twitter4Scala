@@ -1,7 +1,7 @@
 package twstyles
 
 import com.typesafe.config.ConfigFactory
-import twitter4j.conf.ConfigurationBuilder
+import twitter4j.conf.{Configuration, ConfigurationBuilder}
 import twitter4j.{Query, QueryResult, TwitterFactory, Status}
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
@@ -13,7 +13,7 @@ case class Finite(num: Int) extends Depth
 /**
  * A wrapper over
  */
-class TwitterService {
+class TwitterService (config: Configuration) {
 
   implicit class QueryResultImproved(qr: QueryResult) {
 
@@ -29,23 +29,7 @@ class TwitterService {
     }
   }
 
-  val (conf) = ConfigFactory.load()
-
-  val (consumerKey, consumerSecret, accessToken, accessTokenSecret) = (
-    conf.getString("twitter.consumerKey"),
-    conf.getString("twitter.consumerSecret"),
-    conf.getString("twitter.accessToken"),
-    conf.getString("twitter.accessTokenSecret")
-    )
-
-  val (configBuilder) = new ConfigurationBuilder()
-
-  configBuilder.setOAuthConsumerKey(consumerKey)
-  configBuilder.setOAuthConsumerSecret(consumerSecret)
-  configBuilder.setOAuthAccessToken(accessToken)
-  configBuilder.setOAuthAccessTokenSecret(accessTokenSecret)
-
-  val twitter = new TwitterFactory(configBuilder.build()).getInstance
+  val twitter = new TwitterFactory(config).getInstance
 
   def search(str:String): QueryResult = twitter.search(new Query(str))
 

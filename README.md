@@ -3,7 +3,7 @@
 
 Java libraries can be awkward to work with in Scala sometimes.
 Twitter4J is no different!
-This turns some of Twitter4J calls to Twitter's REST APIs into infinite (well in theory) lazy lists!
+This turns some of Twitter4J calls to Twitter's REST APIs into infinite (well, in theory) lazy lists!
 (immutable Streams)
 
 ####example usage:
@@ -27,6 +27,6 @@ fiveHundoHellos.foreach(x => println(x.getText))
 ```
 
 Note:
-1) does not yet handle rate limit exceeded
-2) everything is done synchronously for now (most likely will stay synchronous)
-3) perhaps some buffering is needed, conditional upon load
+1. does not yet handle rate limit exceeded
+2. everything is done synchronously for now (most likely will stay synchronous)
+3. perhaps some buffering is needed, conditional upon load

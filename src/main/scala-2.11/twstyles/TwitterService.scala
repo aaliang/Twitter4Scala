@@ -35,7 +35,16 @@ class TwitterService (config: Configuration) {
 
   def favorites: Stream[Status] = pageableToStream(twitter.getFavorites)
 
+  def favoritesForUser(username: String): Stream[Status] = pageableToStream(twitter.getFavorites(username, _:Paging))
+
   def userTimeLine: Stream[Status] = pageableToStream(twitter.getUserTimeline)
+
+  def sentDirectMessages: Stream[DirectMessage] = pageableToStream(twitter.getSentDirectMessages)
+
+  def myRetweets: Stream[Status] = pageableToStream(twitter.getRetweetsOfMe)
+
+  def timelineForUser(username: String): Stream[Status] = pageableToStream(twitter.getUserTimeline(username, _:Paging))
+
 
   /**
    * Transforms any function that returns a QueryResult to a Stream of Statuses
@@ -57,7 +66,7 @@ class TwitterService (config: Configuration) {
    * @precondition 0 < pageSize <= 1000
    * @return
    */
-  protected def pageableToStream (getterFn: (Paging) => ResponseList[Status], pageSize:Int = 200, pageStart:Int = 1): Stream[Status] = {
+  protected def pageableToStream[A] (getterFn: (Paging) => ResponseList[A], pageSize:Int = 200, pageStart:Int = 1): Stream[A] = {
     val page = new Paging(pageStart, pageSize)
     val initResultList = getterFn(page).toList //TODO: should probably just use toStream tbh
     getPageableStream(initResultList, page, getterFn)
@@ -86,8 +95,8 @@ class TwitterService (config: Configuration) {
     }
   }
 
-  protected def getPageableStream (remainingTweets:List[Status], page:Paging,
-                                  nextResultGetter: (Paging) => ResponseList[Status]): Stream[Status] = {
+  protected def getPageableStream[A] (remainingTweets:List[A], page:Paging,
+                                  nextResultGetter: (Paging) => ResponseList[A]): Stream[A] = {
     remainingTweets match {
       case Nil =>
         page.setPage(page.getCount)

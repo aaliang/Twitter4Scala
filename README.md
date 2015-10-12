@@ -1,5 +1,4 @@
-###TwStyles
-####soon to be renamed to something cooler
+###Twitter4Scala
 
 Java libraries can be awkward to work with in Scala sometimes.
 Twitter4J is no different!

@@ -2,7 +2,7 @@
 
 Java libraries can be awkward to work with in Scala sometimes.
 Twitter4J is no different!
-This turns some of Twitter4J calls to Twitter's REST APIs into infinite (well, in theory) lazy lists!
+This turns some of Twitter4J calls to Twitter's REST APIs into infinite (well, in theory - there are unfortunately only a finite number of tweets in the world after all) lazy lists!
 (immutable Streams)
 
 ####example usage:
